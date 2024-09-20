@@ -18,19 +18,26 @@ export const chip = {
 
 export function RectangleRounded(w: number, h: number, r: number, s: number) {
   // width, height, radiusCorner, smoothness
-  // thanks to Klaus Hoffmeister
   const pi2 = Math.PI * 2;
-  const n = (s + 1) * 4;
+  const n = (s + 1) * 4; // This defines the number of segments for the rounded corners.
   let indices = [];
   let positions = [];
   let uvs = [];
-  let qu, sgx, sgy, x, y;
 
-  for (let j = 1; j < n + 1; j++) indices.push(0, j, j + 1);
-  indices.push(0, n, 1);
+  // Push center vertex (for the fan triangulation)
   positions.push(0, 0, 0);
   uvs.push(0.5, 0.5);
-  for (let j = 0; j < n; j++) contour(j);
+
+  // Generate positions and uvs
+  for (let j = 0; j < n; j++) {
+    contour(j);
+  }
+
+  // Create indices for triangulation (fan)
+  for (let j = 1; j < n; j++) {
+    indices.push(0, j, j + 1);
+  }
+  indices.push(0, n, 1); // Close the loop
 
   const geometry = new THREE.BufferGeometry();
   geometry.setIndex(new THREE.BufferAttribute(new Uint32Array(indices), 1));
@@ -46,11 +53,15 @@ export function RectangleRounded(w: number, h: number, r: number, s: number) {
   return geometry;
 
   function contour(j: number) {
-    qu = Math.trunc((4 * j) / n) + 1;
-    sgx = qu === 1 || qu === 4 ? 1 : -1;
-    sgy = qu < 3 ? 1 : -1;
-    x = sgx * (w / 2 - r) + r * Math.cos((pi2 * (j - qu + 1)) / (n - 4));
-    y = sgy * (h / 2 - r) + r * Math.sin((pi2 * (j - qu + 1)) / (n - 4));
+    // Calculate which quadrant (corner) we're in for the rounded corners
+    const qu = Math.floor((4 * j) / n) + 1;
+    const sgx = qu === 1 || qu === 4 ? 1 : -1;
+    const sgy = qu < 3 ? 1 : -1;
+
+    // Calculate the positions for each point around the contour
+    const angle = (pi2 * (j - qu + 1)) / (n - 4); // This creates the rounded effect
+    const x = sgx * (w / 2 - r) + r * Math.cos(angle);
+    const y = sgy * (h / 2 - r) + r * Math.sin(angle);
 
     positions.push(x, y, 0);
     uvs.push(0.5 + x / w, 0.5 + y / h);

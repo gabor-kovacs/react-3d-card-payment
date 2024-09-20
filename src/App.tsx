@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import CreditCardInput from "react-credit-card-input";
-import findCardType from "credit-card-type";
-import styled from "styled-components";
-import { Canvas } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
+import styled from "@emotion/styled";
 import Button from "@mui/material/Button";
+import { Environment } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import findCardType from "credit-card-type";
+import { useEffect, useState } from "react";
+import CreditCardInput from "react-credit-card-input";
 import CreditCard from "./creditCard/creditCard";
 import { creditCardType } from "./creditCard/lib";
 
@@ -70,7 +70,7 @@ function App() {
             type="text"
             value={fullName}
             onChange={handleNameChange}
-            placeholder="Enter your full name"
+            placeholder="Name"
           />
           <CreditCardInput
             cardNumberInputProps={{
